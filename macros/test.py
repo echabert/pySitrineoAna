@@ -9,7 +9,7 @@ gStyle.SetOptStat(0)
 
 inputDir="/Users/echabert/Work/taf/Results/"
 tafDir="/Users/echabert/Work/taf"
-csvfilename="data/CyrceJune2020.csv"
+csvfilename="../data/CyrceJune2020.csv"
 directory = "/Users/echabert/Work/taf/Results/"
 odirectory = "Results/AnaBeamSpot/"
 #filenamebase = "BeamProfile_run"
