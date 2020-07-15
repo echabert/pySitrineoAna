@@ -2,6 +2,7 @@ import ROOT
 from ROOT import gROOT,TEllipse, TH1F, TH2F, TCanvas, TF1, TFile, TGraph, gApplication, TLegend
 import copy
 import math
+from pySitrineoAna.code.BeamSpot import BeamSpot
 
 
 nxPixels = 960
