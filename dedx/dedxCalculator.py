@@ -55,18 +55,22 @@ class dEdxCalculator:
                     self.LoadDeDxTable(value.strip(), 2212)
                 
     def LoadDeDxTable(self,filename, pid):
-        print("loading tbale")
+        #print("loading tbale")
         with open(filename) as ifile:
             for line in ifile:
                 if pid == 1: self.dEdxTable_e.append([float(line.split()[0]),float(line.split()[1])])
-                if pid == 2212: self.dEdxTable_e.append([float(line.split()[0]),float(line.split()[1])])
-        print(self.dEdxTable_e)
+                if pid == 2212: self.dEdxTable_p.append([float(line.split()[0]),float(line.split()[1])])
+        #print(self.dEdxTable_e)
 
     def LoadFitParameters(self,a,b): 
         """ assumes clusterSize = a x log (b/T)
         """
         self.sigma = math.sqrt(a*pow(pitch,2)/(2*math.pi))
 
+
+    def GetdEdXFromCharge(self, charge):
+        return (charge*self.Eg)/(self.pitch*100/self.rho)
+ 
     def GetdEdX(self,clusterSize):
         """
          Compute dEdX based on the cluster size
@@ -81,31 +85,34 @@ class dEdxCalculator:
         return self.GetCharge(clusterSize)*self.Eg
 
     def GetMomenta(self, clusterSize, pid = 11):
-        if pid == 11: return self.GetMomenta(GetdEdX(clusterSize), dEdxTable_e)
-        if pid == 2212: return self.GetMomenta(GetdEdX(clusterSize), dEdxTable_p)
+        if pid == 11: return self.GetMomentaFromDeDx(GetdEdX(clusterSize), dEdxTable_e)
+        if pid == 2212: return self.GetMomentaFromDeDx(GetdEdX(clusterSize), dEdxTable_p)
 
     """ For internal use """
-    def GetMomenta(self, clusterSize, pid):
+    def GetMomentaFromDeDx(self, dedx, pid):
         """
          Perform a linear interpolation
          Could be improved by 2nd order pol interpolation
         """
-        dedx = self.GetdEdX(clusterSize)
+        #dedx = self.GetdEdX(clusterSize)
         table = []
+        #print("i'm here")
         if pid == 11:
             table = self.dEdxTable_e
         if pid == 2212:
             table = self.dEdxTable_p
-        print(table)
+        #print(table)
         for index in range(len(table)-1):
-            if dedx>table[index][1] and dedx<table[index+1][1]:
+            #print(table[index][1] ,dedx,table[index+1][1])
+            if dedx<table[index][1] and dedx>table[index+1][1]:
                 return self.LinearInterpolation(dedx,table[index][0],table[index][1],table[index+1][0],table[index+1][1])
         return -1 # if it fails
 
-    def LinearInterpolation(self,x0,x1,y1,x2,y2):
+    def LinearInterpolation(self,y0,x1,y1,x2,y2):
         a = (y2-y1)/(x2-x1)
         b = y1-a*x1
-        return a*x0+b
+        #return a*x0+b
+        return (y0-b)/a
    
     #def CubicSpline(self, x0, x1, y1, x2, y2):
     #    tx = (x0-x1)/(x2-x1)
