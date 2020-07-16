@@ -1,5 +1,4 @@
-from pySitrineoAna.config import RunManager
-from pySitrineoAna.runs import run
+from pySitrineoAna.runs import RunManager, run
 from ROOT import TCanvas, TH1F, TH2F, TLegend
 
 class PlotOverlay:
