@@ -1,7 +1,7 @@
-from pySitrineoAna.config.RunManager import RunManager
+from pySitrineoAna.runs.RunManager import RunManager
 from pySitrineoAna.plots.PlotOverlay import PlotOverlay
 from pySitrineoAna.plots.TrendPlot import TrendPlot
-from pySitrineoAna.code.AnaBeamSpot import *
+from pySitrineoAna.base.AnaBeamSpot import *
 from ROOT import TFile, gStyle
 
 gStyle.SetOptTitle(0)
@@ -37,6 +37,7 @@ print("step 5")
 p2 = PlotOverlay(m,[7,8,9,10,11,12,13])
 p2.SetOptions(False,False)
 c2 = p2.GetCanvas(filenamebase,"hhitpixpl4")
+c2.Draw()
 c2.Print("canv.root")
 #
 
