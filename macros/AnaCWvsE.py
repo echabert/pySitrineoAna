@@ -2,7 +2,7 @@ import ROOT
 from ROOT import gROOT, TH1F, TCanvas, TF1, TFile, TGraph, TGraphErrors, gApplication, TLegend
 #import sys
 #sys.path.append("..")
-from pySitrineoAna.code.Functions import do3LandauFit
+from pySitrineoAna.base.Functions import do3LandauFit
 #import pySitrineoAna.code.Functions  
 #from pySitrineoAna.code import Functions 
 #from Functions import  do3LandauFit 
