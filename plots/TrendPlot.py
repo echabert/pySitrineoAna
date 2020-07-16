@@ -1,6 +1,5 @@
-from pySitrineoAna.config import RunManager
-from pySitrineoAna.runs import run
-from pySitrineoAna.code.AnaBeamSpot import *
+from pySitrineoAna.runs import RunManager, run
+from pySitrineoAna.base.AnaBeamSpot import *
 from ROOT import TCanvas, TH1F, TH2F, TGraphErrors, TLegend
 
 class TrendPlot:
