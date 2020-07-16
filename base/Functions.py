@@ -1,5 +1,6 @@
 import ROOT
 from ROOT import gROOT, TH1F, TCanvas, TF1, TFile, TGraph, TGraphErrors, gApplication, TLegend
+import math
 
 
 # function to fit the cluster size with a sum of 3 landau distribution
@@ -40,4 +41,14 @@ def do3LandauFit(histo,xmin=1.5,xmax=15.5,initparams = [[100000,10,0.7],[100000,
                {"mpv":mpv_2,"mpvErr":mpvErr_2,"norm":norm_2,"normErr":normErr_2},\
                {"mpv":mpv_3,"mpvErr":mpvErr_3,"norm":norm_3,"normErr":normErr_3}]
     return results, chi2
+
+
+def GaussInteg(xmin, xmax, mean, sigma):
+    """
+      Int_-a^a gauss(0,sigma) = erf(a/(sigma x sqrt(2))
+    """
+    RightInteg = 0.5*math.erf((xmax-mean)/(sigma*math.sqrt(2)))
+    LeftInteg = 0.5*math.erf((mean-xmin)/(sigma*math.sqrt(2)))
+    return RightInteg+LeftInteg
+
 
