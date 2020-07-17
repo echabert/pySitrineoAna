@@ -40,6 +40,7 @@ runs = [(6,5),(8,8),(9,10),(10,12),(14,15),(11,20),(12,25),(13,30)]
 plotname = "hhitpixpl"
 
 ofile = TFile("res.root","RECREATE")
+ResFile = open("ResAnavsThr.log","a")
 
 canvas = TCanvas()
 canvasTmp = TCanvas()
@@ -49,8 +50,18 @@ graphs = []
 leg = TLegend(0.6,0.8,0.7,0.9)
 
 fitType = "combi" #gauss or combi
-valueType = "mode" #fit , mean or mode
+valueType = "mean" #fit , mean or mode
 ipeak = 2 # could be peak 1,2 or 3 - only use if valueType = "mode"
+
+dictPeak = {}
+with open("peakdictionnary.dat","r") as dictFile:
+    for line in dictFile:
+        key = line.split()[0]
+        run = key.split(",")[0].split("(")[1]
+        plane = key.split(",")[1].split(")")[0]
+        values = [int(i) for i in line.split()[1:]]
+        dictPeak[(int(run),int(plane))] = values
+print(dictPeak)
 
 f1 = TF1()
 if fitType == "gauss":
@@ -69,6 +80,9 @@ else:
     f1.SetParameter(0,15)
     f1.SetParameter(1,10)
     f1.SetParameter(2,5)
+
+ResFile.write("###############################\n")
+ResFile.write("## Type: "+fitType+" - Peak: "+str(ipeak)+"\n")
 
 for channel in range(1,5):
 #for channel in range(1,5):
@@ -93,6 +107,7 @@ for channel in range(1,5):
       mean = plot.GetMean()
       canvasTmp.cd()
       if valueType == "mode":
+          """
           #search for maximum
           maxima = SearchMaxima(plot,100)
           print("Maximum are: ",maxima)
@@ -117,7 +132,8 @@ for channel in range(1,5):
                   mylist = [i for i in maxima if i>0 and i<4]
                   if len(mylist)>0: imean = int(mylist[-1])
                   else: imean = int(maxima[ipeak-1])
-            
+            """
+          imean = dictPeak[(run[0],channel)][ipeak-1]
           mean = plot.GetBinContent(imean-1)*plot.GetBinCenter(imean-1)\
                   + plot.GetBinContent(imean)*plot.GetBinCenter(imean)\
                   + plot.GetBinContent(imean+1)*plot.GetBinCenter(imean+1)
@@ -174,14 +190,29 @@ for channel in range(1,5):
     a = f1.GetParameter(1)
     b = f1.GetParameter(2)
     #QtotErr = math.sqrt(math.pow(1+b,2)*math.pow(matrix[1][1],2)+math.pow(a,2)*math.pow(matrix[2][2],2)+a*b*matrix[1][2])
-    QtotErr = math.sqrt(math.pow(1+b,2)*math.pow(matrix[1][1],2)+math.pow(a,2)*math.pow(matrix[2][2],2))
+    #QtotErr = math.sqrt(math.pow(1+b,2)*math.pow(matrix[1][1],2)+math.pow(a,2)*math.pow(matrix[2][2],2))
+    QtotErr = math.sqrt(math.pow(1+b,2)*matrix[1][1]+math.pow(a,2)*matrix[2][2])
   
    print("Sigma spatial =",math.sqrt(f1.GetParameter(0))," microns")
+   if fitType == "combi":
+       print("Width (flat) = ",f1.GetParameter(2),"+/-",math.sqrt(matrix[2][2]))
    print("Charge (tot) = ",Qtot," e-")
    print("Charge error = ",QtotErr," e-")
    print("dEdx = ",calc.GetdEdXFromCharge(Qtot)," MeV.cm2/g")
    #print(calc.GetMomentaFromDeDx(calc.GetdEdXFromCharge(Qtot),2212))
    print("P = ",calc.GetMomentaFromDeDx(calc.GetdEdXFromCharge(Qtot),2212), " MeV")
+   
+   # Write results in a file
+   ResFile.write("## Run "+str(run[0])+" - plane "+str(channel)+"\n")
+   ResFile.write("Sigma spatial ="+str(math.sqrt(f1.GetParameter(0)))+" microns\n")
+   ResFile.write("Width (flat) = "+str(f1.GetParameter(2))+"+/-"+str(math.sqrt(matrix[2][2]))+"\n")
+   ResFile.write("Charge (tot) = "+str(Qtot)+" e-\n")
+   ResFile.write("Charge error = "+str(QtotErr)+" e-\n")
+   ResFile.write("dEdx = "+str(calc.GetdEdXFromCharge(Qtot))+" MeV.cm2/g\n")
+   ResFile.write("dEdx interval = "+str(calc.GetdEdXFromCharge(Qtot-QtotErr))+" - "+str(calc.GetdEdXFromCharge(Qtot+QtotErr))+" MeV.cm2/g\n")
+   ResFile.write("P = "+str(calc.GetMomentaFromDeDx(calc.GetdEdXFromCharge(Qtot),2212))+" MeV\n")
+   ResFile.write("P interval= "+str(calc.GetMomentaFromDeDx(calc.GetdEdXFromCharge(Qtot-QtotErr),2212))+" - "+str(calc.GetMomentaFromDeDx(calc.GetdEdXFromCharge(Qtot+QtotErr),2212))+" MeV\n")
+
    if first: 
        #plot.Draw()
        ofile.cd()
@@ -196,5 +227,6 @@ for channel in range(1,5):
 leg.Draw("same")
 canvas.Print("canvas.png")
 canvas.Print("canvas.root")
+ResFile.close()
 
 #app.Run()
