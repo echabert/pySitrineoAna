@@ -4,6 +4,7 @@ ROOT.gROOT.Reset()
 #app = ROOT.gApplication
 import math
 
+#comment: work with /Users/echabert/Work/root6.19/build/bin/root
 
 #########################################
 # Configuration
